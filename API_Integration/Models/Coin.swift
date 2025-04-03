@@ -3,7 +3,7 @@ Purpose: Represents a single cryptocurrency’s data.
 Type: This model contains the actual data fetched from the API for a specific coin.
 
 Example: A Coin struct would include properties such as:
-symbol (e.g., "BTC" for Bitcoin)
+symbol (e.g., "BTC" for Bitcoin))
 name (e.g., "Bitcoin")
 price (the current price of the coin)
 marketCap (the total market capitalization)
