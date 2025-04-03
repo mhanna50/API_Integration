@@ -12,3 +12,31 @@ Usage: This data model is used to store the raw data fetched from an API, which 
  
  Created by michael hanna on 4/1/25.
 */
+import Foundation
+
+// Define a struct for the Coin
+struct Coin: Identifiable, Decodable {
+    var id = UUID() // Unique ID for each coin object in the list
+    var symbol: String
+    var name: String
+    var rank: Int
+    var price: String
+    var market_cap: String
+    var volume_24h: String
+    var delta_24h: String
+}
+
+// Define the response structure to match the JSON returned by the API
+struct CryptoResponse: Decodable {
+    var coins: [Coin]
+    var last_updated_timestamp: Int
+    var remaining: Int
+}
+struct CryptoGlobalStats: Decodable {
+    var coins: Int
+    var markets: Int
+    var total_market_cap: Double
+    var total_volume_24h: Double
+    var last_updated_timestamp: Double
+    var remaining: Int
+}

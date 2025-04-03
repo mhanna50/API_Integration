@@ -39,17 +39,68 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var stats: CryptoGlobalStats?
+    @State private var isLoading: Bool = true
+    @State private var errorMessage: String?
+    
+    // Instance of the APIService class
+    private let apiService = APIService()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationView {
+            VStack {
+                if isLoading {
+                    ProgressView("Loading...")
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .padding()
+                } else if let errorMessage = errorMessage {
+                    Text("Error: \(errorMessage)")
+                        .foregroundColor(.red)
+                        .padding()
+                } else if let stats = stats {
+                    VStack(alignment: .leading, spacing: 20) {
+                        Text("Total Coins: \(stats.coins)")
+                            .font(.headline)
+                        Text("Total Markets: \(stats.markets)")
+                            .font(.headline)
+                        Text("Total Market Cap: \(stats.total_market_cap) EUR")
+                            .font(.headline)
+                        Text("Total Volume (24h): \(stats.total_volume_24h) EUR")
+                            .font(.headline)
+                        Text("Last Updated: \(stats.last_updated_timestamp)")
+                            .font(.subheadline)
+                        Text("Remaining API Requests: \(stats.remaining)")
+                            .font(.subheadline)
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Global Crypto Stats")
+            .onAppear {
+                fetchGlobalStats()
+            }
         }
-        .padding()
+    }
+
+    private func fetchGlobalStats() {
+        // Call the API service to fetch data
+        apiService.fetchGlobalMarketStats { result in
+            switch result {
+            case .success(let fetchedStats):
+                stats = fetchedStats
+                isLoading = false
+            case .failure(let error):
+                errorMessage = error.localizedDescription
+                isLoading = false
+            }
+        }
     }
 }
 
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }
+
+
