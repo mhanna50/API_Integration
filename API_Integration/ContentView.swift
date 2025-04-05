@@ -39,60 +39,37 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var stats: CryptoGlobalStats?
-    @State private var isLoading: Bool = true
-    @State private var errorMessage: String?
-    
-    // Instance of the APIService class
-    private let apiService = APIService()
+    @State private var selectedView = 1 // Default to Coin List View
     
     var body: some View {
         NavigationView {
             VStack {
-                if isLoading {
-                    ProgressView("Loading...")
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .padding()
-                } else if let errorMessage = errorMessage {
-                    Text("Error: \(errorMessage)")
-                        .foregroundColor(.red)
-                        .padding()
-                } else if let stats = stats {
-                    VStack(alignment: .leading, spacing: 20) {
-                        Text("Total Coins: \(stats.coins)")
-                            .font(.headline)
-                        Text("Total Markets: \(stats.markets)")
-                            .font(.headline)
-                        Text("Total Market Cap: \(stats.total_market_cap) EUR")
-                            .font(.headline)
-                        Text("Total Volume (24h): \(stats.total_volume_24h) EUR")
-                            .font(.headline)
-                        Text("Last Updated: \(stats.last_updated_timestamp)")
-                            .font(.subheadline)
-                        Text("Remaining API Requests: \(stats.remaining)")
-                            .font(.subheadline)
-                    }
-                    .padding()
+                // Custom Picker with Styled Background and Segments
+                Picker("Select View", selection: $selectedView) {
+                    Text("Global Stats").tag(0)
+                    Text("Coin List").tag(1)
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding()
+                .background(Color.blue.opacity(0.1)) // Light background for Picker
+                .cornerRadius(10)
+                .padding(.horizontal)
+                
+                // View transitions with animation
+                if selectedView == 0 {
+                    GlobalStatsView()
+                        .transition(.slide)
+                        .animation(.easeInOut(duration: 0.3), value: selectedView)
+                } else {
+                    CoinListView()
+                        .transition(.slide)
+                        .animation(.easeInOut(duration: 0.3), value: selectedView)
                 }
             }
-            .navigationTitle("Global Crypto Stats")
-            .onAppear {
-                fetchGlobalStats()
-            }
-        }
-    }
-
-    private func fetchGlobalStats() {
-        // Call the API service to fetch data
-        apiService.fetchGlobalMarketStats { result in
-            switch result {
-            case .success(let fetchedStats):
-                stats = fetchedStats
-                isLoading = false
-            case .failure(let error):
-                errorMessage = error.localizedDescription
-                isLoading = false
-            }
+            .navigationBarTitle("Cryptocurrency Prices", displayMode: .inline) // Title in navigation bar
+            .background(Color(.systemGray6)) // Light background color
+            .cornerRadius(20)
+            .padding()
         }
     }
 }
@@ -100,7 +77,6 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .preferredColorScheme(.dark) // Preview in dark mode for better visibility
     }
 }
-
-

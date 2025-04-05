@@ -14,29 +14,82 @@ Usage: This data model is used to store the raw data fetched from an API, which 
 */
 import Foundation
 
-// Define a struct for the Coin
-struct Coin: Identifiable, Decodable {
-    var id = UUID() // Unique ID for each coin object in the list
-    var symbol: String
-    var name: String
-    var rank: Int
-    var price: String
-    var market_cap: String
-    var volume_24h: String
-    var delta_24h: String
+// Global Stats Model
+struct CryptoGlobalStats: Decodable {
+    let coins: Int
+    let markets: Int
+    let total_market_cap: String
+    let total_volume_24h: String
+    
+    enum CodingKeys: String, CodingKey {
+        case coins, markets, total_market_cap, total_volume_24h
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.coins = try container.decode(Int.self, forKey: .coins)
+        self.markets = try container.decode(Int.self, forKey: .markets)
+        
+        // Handle decoding of 'total_market_cap' and 'total_volume_24h' as a string or number
+        self.total_market_cap = try CryptoGlobalStats.decodeAsString(container: container, forKey: .total_market_cap)
+        self.total_volume_24h = try CryptoGlobalStats.decodeAsString(container: container, forKey: .total_volume_24h)
+    }
+
+    // Utility method for decoding mixed data types into a string
+    private static func decodeAsString(container: KeyedDecodingContainer<CodingKeys>, forKey key: CodingKeys) throws -> String {
+        if let stringValue = try? container.decode(String.self, forKey: key) {
+            return stringValue
+        } else if let doubleValue = try? container.decode(Double.self, forKey: key) {
+            return String(doubleValue)
+        } else if let intValue = try? container.decode(Int.self, forKey: key) {
+            return String(intValue)
+        } else {
+            return "" // Fallback to empty string if decoding fails
+        }
+    }
 }
 
-// Define the response structure to match the JSON returned by the API
-struct CryptoResponse: Decodable {
-    var coins: [Coin]
-    var last_updated_timestamp: Int
-    var remaining: Int
+// Coin Model
+struct Coin: Decodable, Identifiable {
+    var id = UUID()
+    let symbol: String
+    let name: String
+    let rank: Int
+    let price: String
+    let market_cap: String
+    let volume_24h: String
+    
+    enum CodingKeys: String, CodingKey {
+        case symbol, name, rank, price, market_cap, volume_24h
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.symbol = try container.decode(String.self, forKey: .symbol)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.rank = try container.decode(Int.self, forKey: .rank)
+        
+        // Decode price, market_cap, and volume_24h as strings (handling potential number types)
+        self.price = try Coin.decodeAsString(container: container, forKey: .price)
+        self.market_cap = try Coin.decodeAsString(container: container, forKey: .market_cap)
+        self.volume_24h = try Coin.decodeAsString(container: container, forKey: .volume_24h)
+    }
+
+    // Utility method for decoding mixed data types into a string
+    private static func decodeAsString(container: KeyedDecodingContainer<CodingKeys>, forKey key: CodingKeys) throws -> String {
+        if let stringValue = try? container.decode(String.self, forKey: key) {
+            return stringValue
+        } else if let doubleValue = try? container.decode(Double.self, forKey: key) {
+            return String(doubleValue)
+        } else if let intValue = try? container.decode(Int.self, forKey: key) {
+            return String(intValue)
+        } else {
+            return "" // Fallback to empty string if decoding fails
+        }
+    }
 }
-struct CryptoGlobalStats: Decodable {
-    var coins: Int
-    var markets: Int
-    var total_market_cap: Double
-    var total_volume_24h: Double
-    var last_updated_timestamp: Double
-    var remaining: Int
+
+// Coin List Response Model
+struct CoinListResponse: Decodable {
+    let coins: [Coin]
 }
