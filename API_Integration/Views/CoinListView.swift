@@ -43,11 +43,11 @@ struct CoinListView: View {
                                     Spacer()
 
                                     if coin.delta_24h.first == "-" {
-                                        Image("RedArrow")
+                                        Image("Red_Arrow")
                                             .resizable()
                                             .frame(width: 25, height: 25)
                                     } else {
-                                        Image("GreenArrow")
+                                        Image("Green_Arrow")
                                             .resizable()
                                             .frame(width: 25, height: 25)
                                     }

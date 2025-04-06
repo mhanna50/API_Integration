@@ -43,7 +43,7 @@ class APIService {
     }
 
     func fetchGlobalMarketStats(completion: @escaping (Result<CryptoGlobalStats, Error>) -> Void) {
-        let urlString = "\(baseURL)/global?key=\(apiKey)&pref=EUR"
+        let urlString = "\(baseURL)/global?key=\(apiKey)&pref=USD"
         
         guard let url = URL(string: urlString) else {
             completion(.failure(APIError.invalidURL))
