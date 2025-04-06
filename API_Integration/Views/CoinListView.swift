@@ -30,6 +30,16 @@ struct CoinListView: View {
                             Text(coin.name)
                                 .font(.headline)
                                 .frame(maxWidth: .infinity, alignment: .leading)
+                            if coin.delta_24h[coin.delta_24h.startIndex] == "-" {
+                                Image("RedArrow")
+                                    .resizable()
+                                    .frame(width: 25, height: 25)
+                            }
+                            else {
+                                Image("GreenArrow")
+                                    .resizable()
+                                    .frame(width: 25, height: 25)
+                            }
                             Text(coin.symbol)
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
@@ -37,7 +47,7 @@ struct CoinListView: View {
                         HStack {
                             Text("Rank: \(coin.rank)")
                             Spacer()
-                            Text("Price: \(coin.price)")
+                            Text("Price: $\(coin.price)")
                         }
                         .font(.subheadline)
                         .foregroundColor(.secondary)

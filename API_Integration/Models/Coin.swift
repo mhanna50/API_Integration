@@ -8,6 +8,7 @@ name (e.g., "Bitcoin")
 price (the current price of the coin)
 marketCap (the total market capitalization)
 volume24h (the 24-hour trading volume)
+delta24h (the 24-hour percent change in price)
 Usage: This data model is used to store the raw data fetched from an API, which you can then manipulate and display in the app.
  
  Created by michael hanna on 4/1/25.
@@ -58,9 +59,10 @@ struct Coin: Decodable, Identifiable {
     let price: String
     let market_cap: String
     let volume_24h: String
+    let delta_24h: String
     
     enum CodingKeys: String, CodingKey {
-        case symbol, name, rank, price, market_cap, volume_24h
+        case symbol, name, rank, price, market_cap, volume_24h, delta_24h
     }
     
     init(from decoder: Decoder) throws {
@@ -73,6 +75,7 @@ struct Coin: Decodable, Identifiable {
         self.price = try Coin.decodeAsString(container: container, forKey: .price)
         self.market_cap = try Coin.decodeAsString(container: container, forKey: .market_cap)
         self.volume_24h = try Coin.decodeAsString(container: container, forKey: .volume_24h)
+        self.delta_24h = try Coin.decodeAsString(container: container, forKey: .delta_24h)
     }
 
     // Utility method for decoding mixed data types into a string
