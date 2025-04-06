@@ -46,30 +46,47 @@ struct ContentView: View {
             VStack {
                 // Custom Picker with Styled Background and Segments
                 Picker("Select View", selection: $selectedView) {
-                    Text("Global Stats").tag(0)
-                    Text("Coin List").tag(1)
+                    Text("Global Stats")
+                        .tag(0)
+                        .foregroundColor(selectedView == 0 ? .blue : .black)
+                    Text("Coin List")
+                        .tag(1)
+                        .foregroundColor(selectedView == 1 ? .blue : .black)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding()
-                .background(Color.blue.opacity(0.1)) // Light background for Picker
+                .background(Color.gray.opacity(0.3)) // Light background for Picker
                 .cornerRadius(10)
-                .padding(.horizontal)
+                //.padding(.horizontal)
                 
                 // View transitions with animation
-                if selectedView == 0 {
-                    GlobalStatsView()
-                        .transition(.slide)
-                        .animation(.easeInOut(duration: 0.3), value: selectedView)
-                } else {
-                    CoinListView()
-                        .transition(.slide)
-                        .animation(.easeInOut(duration: 0.3), value: selectedView)
+                Group {
+                    if selectedView == 0 {
+                        GlobalStatsView()
+                            .transition(.slide)
+                            .animation(.easeInOut(duration: 0.3), value: selectedView)
+                    } else {
+                        CoinListView()
+                            .transition(.slide)
+                            .animation(.easeInOut(duration: 0.3), value: selectedView)
+                    }
+                }
+                .padding(.top) // Add space between the Picker and Views
+                
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Cryptocurrency Prices")
+                        .font(.largeTitle) // Increase the font size
+                        .foregroundColor(.black) // White text color
+                        .shadow(color: .blue, radius: 5, x: 0, y: 2) // Blue shadow behind the text
                 }
             }
-            .navigationBarTitle("Cryptocurrency Prices", displayMode: .inline) // Title in navigation bar
-            .background(Color(.systemGray6)) // Light background color
+            .background(Color.black) // Black background color
             .cornerRadius(20)
             .padding()
+
         }
     }
 }

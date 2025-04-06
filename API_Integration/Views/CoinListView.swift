@@ -4,112 +4,142 @@ import Kingfisher
 struct CoinListView: View {
     @State private var coins: [Coin] = []
     @State private var isLoading = true
-    @State private var searchQuery = "" // The search query entered by the user
-    @State private var filteredCoins: [Coin] = [] // The filtered coins based on the search query
-    
+    @State private var searchQuery = ""
+    @State private var filteredCoins: [Coin] = []
+
     var body: some View {
-        VStack {
-            // Search Bar
-            SearchBar(text: $searchQuery)
-                .padding(.horizontal)
-                .padding(.top)
-            
-            // Show loading message while the data is being fetched
-            if isLoading {
-                Text("Loading coins...")
-                    .foregroundColor(.gray)
-                    .padding(.top, 20)
-            } else {
-                // List of coins
-                List(filteredCoins) { coin in
-                    VStack(alignment: .leading) {
-                        HStack {
-                            KFImage(URL(string: "https://coinlib.io/static/img/coins/small/\((coin.symbol).lowercased()).png"))
-                                .resizable()
-                                .frame(width: 25, height: 25)
-                            Text(coin.name)
-                                .font(.headline)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            if coin.delta_24h[coin.delta_24h.startIndex] == "-" {
-                                Image("RedArrow")
-                                    .resizable()
-                                    .frame(width: 25, height: 25)
-                            }
-                            else {
-                                Image("GreenArrow")
-                                    .resizable()
-                                    .frame(width: 25, height: 25)
-                            }
-                            Text(coin.symbol)
+        NavigationView {
+            ZStack {
+                // Linear Gradient Background
+                LinearGradient(colors: [.black, Color.blue.opacity(0.3)], startPoint: .top, endPoint: .bottom)
+                    .ignoresSafeArea()
+
+                VStack {
+                    // Search Bar
+                    SearchBar(text: $searchQuery)
+                        .padding(.horizontal)
+                        .padding(.top, -35)
+
+                    if isLoading {
+                        Spacer()
+                        ProgressView("Loading coins...")
+                            .padding()
+                        Spacer()
+                    } else {
+                        List(filteredCoins) { coin in
+                            VStack(alignment: .leading, spacing: 10) {
+                                HStack {
+                                    KFImage(URL(string: "https://coinlib.io/static/img/coins/small/\((coin.symbol).lowercased()).png"))
+                                        .resizable()
+                                        .frame(width: 25, height: 25)
+
+                                    Text(coin.name)
+                                        .font(.headline)
+                                        .padding(6)
+                                        .background(Color.black.opacity(0.7))
+                                        .foregroundColor(.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                                    Spacer()
+
+                                    if coin.delta_24h.first == "-" {
+                                        Image("RedArrow")
+                                            .resizable()
+                                            .frame(width: 25, height: 25)
+                                    } else {
+                                        Image("GreenArrow")
+                                            .resizable()
+                                            .frame(width: 25, height: 25)
+                                    }
+
+                                    Text(coin.symbol)
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                }
+
+                                HStack {
+                                    Text("Rank: \(coin.rank)")
+                                    Spacer()
+                                    Text("Price: $\(coin.price)")
+                                }
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
+                                .padding(6)
+                                .background(Color.black.opacity(0.6))
+                                .foregroundColor(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                                HStack {
+                                    Text("Market Cap: \(coin.market_cap)")
+                                    Spacer()
+                                    Text("Volume (24h): \(coin.volume_24h)")
+                                }
+                                .font(.subheadline)
+                                .padding(6)
+                                .background(Color.black.opacity(0.6))
+                                .foregroundColor(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                            }
+                            .padding()
+                            .background(
+                                BlurView(style: .systemUltraThinMaterialDark)
+                                    .background(Color.white.opacity(0.05))
+                                    .cornerRadius(16)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                                    )
+                            )
+                            .shadow(color: .blue.opacity(0.2), radius: 6, x: 0, y: 4)
+                            .listRowBackground(Color.clear)
+                            .padding(.vertical, 5)
                         }
-                        HStack {
-                            Text("Rank: \(coin.rank)")
-                            Spacer()
-                            Text("Price: $\(coin.price)")
+                        .listStyle(PlainListStyle())
+                        .onAppear {
+                            UITableView.appearance().separatorStyle = .none
                         }
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        HStack {
-                            Text("Market Cap: \(coin.market_cap)")
-                            Spacer()
-                            Text("Volume (24h): \(coin.volume_24h)")
-                        }
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
                     }
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(8)
-                    .shadow(radius: 5)
-                    .padding(.bottom, 5)
-                }
-                .listStyle(PlainListStyle()) // Use plain style to make it more customizable
-                .padding(.top, 10)
-                .onAppear {
-                    UITableView.appearance().separatorStyle = .none // Hide default separators for a cleaner look
                 }
             }
+            .navigationBarTitle("Coins", displayMode: .inline)
         }
         .onAppear {
-            // Fetch the list of coins from the API
             APIService().fetchCoinList(page: 1) { result in
                 switch result {
                 case .success(let data):
                     self.coins = data.coins
-                    self.filteredCoins = data.coins // Initialize filteredCoins with all coins
+                    self.filteredCoins = data.coins
                     self.isLoading = false
                 case .failure(let error):
                     print("Error: \(error)")
                 }
             }
         }
-        .onChange(of: searchQuery) { newValue in
-            // Filter coins based on the search query
-            if newValue.isEmpty {
+        .onChange(of: searchQuery) {
+            if searchQuery.isEmpty {
                 filteredCoins = coins
             } else {
                 filteredCoins = coins.filter { coin in
-                    coin.name.lowercased().contains(newValue.lowercased()) || coin.symbol.lowercased().contains(newValue.lowercased())
+                    coin.name.lowercased().contains(searchQuery.lowercased()) ||
+                    coin.symbol.lowercased().contains(searchQuery.lowercased())
                 }
             }
         }
     }
 }
 
-// Custom Search Bar View
+// MARK: - Search Bar
+
 struct SearchBar: View {
     @Binding var text: String
-    
+
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundColor(.gray)
+                .foregroundColor(.white)
             TextField("Search for a coin...", text: $text)
                 .padding(7)
                 .padding(.horizontal, 25)
-                .background(Color.gray.opacity(0.1))
+                .background(Color.gray.opacity(0.15))
                 .cornerRadius(10)
                 .overlay(
                     HStack {
@@ -130,6 +160,11 @@ struct SearchBar: View {
         .padding(.top)
     }
 }
+
+// MARK: - Blur View Helper (iOS 15+)
+
+
+// MARK: - Preview
 
 struct CoinListView_Previews: PreviewProvider {
     static var previews: some View {
