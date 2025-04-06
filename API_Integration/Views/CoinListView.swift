@@ -1,4 +1,5 @@
 import SwiftUI
+import Kingfisher
 
 struct CoinListView: View {
     @State private var coins: [Coin] = []
@@ -23,6 +24,9 @@ struct CoinListView: View {
                 List(filteredCoins) { coin in
                     VStack(alignment: .leading) {
                         HStack {
+                            KFImage(URL(string: "https://coinlib.io/static/img/coins/small/\((coin.symbol).lowercased()).png"))
+                                .resizable()
+                                .frame(width: 25, height: 25)
                             Text(coin.name)
                                 .font(.headline)
                                 .frame(maxWidth: .infinity, alignment: .leading)
