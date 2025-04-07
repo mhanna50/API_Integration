@@ -137,4 +137,52 @@ class APIService {
         
         task.resume()
     }
+    
+    func fetchCoinDetails(coinSymbol: String = "BTC", completion: @escaping (Result<DetailedCoin, Error>) -> Void) {
+        let urlString = "\(baseURL)/coin?key=\(apiKey)&pref=USD&symbol=\(coinSymbol)"
+        
+        guard let url = URL(string: urlString) else {
+            completion(.failure(APIError.invalidURL))
+            return
+        }
+        
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                if (error as NSError).code == NSURLErrorNotConnectedToInternet {
+                    completion(.failure(APIError.networkError("No internet connection.")))
+                } else {
+                    completion(.failure(APIError.networkError(error.localizedDescription)))
+                }
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(APIError.noDataReceived))
+                return
+            }
+            
+            // Debugging: Print the raw JSON response
+            do {
+                let json = try JSONSerialization.jsonObject(with: data, options: [])
+                print("Raw API Response: \(json)")
+            } catch {
+                print("Failed to serialize JSON: \(error)")
+                completion(.failure(APIError.decodingError))
+                return
+            }
+
+            // Now attempt to decode the response
+            do {
+                let decodedResponse = try JSONDecoder().decode(DetailedCoin.self, from: data)
+                DispatchQueue.main.async {
+                    completion(.success(decodedResponse))
+                }
+            } catch {
+                print("Failed to decode response: \(error)")
+                completion(.failure(APIError.decodingError))
+            }
+        }
+        
+        task.resume()
+    }
 }

@@ -52,6 +52,9 @@ struct ContentView: View {
                     Text("Coin List")
                         .tag(1)
                         .foregroundColor(selectedView == 1 ? .blue : .black)
+                    Text("Coin Lookup")
+                        .tag(2)
+                        .foregroundColor(selectedView == 2 ? .blue : .black)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding()
@@ -65,8 +68,13 @@ struct ContentView: View {
                         GlobalStatsView()
                             .transition(.slide)
                             .animation(.easeInOut(duration: 0.3), value: selectedView)
-                    } else {
+                    } else if selectedView == 1 {
                         CoinListView()
+                            .transition(.slide)
+                            .animation(.easeInOut(duration: 0.3), value: selectedView)
+                    }
+                    else {
+                        DetailedCoinView()
                             .transition(.slide)
                             .animation(.easeInOut(duration: 0.3), value: selectedView)
                     }
