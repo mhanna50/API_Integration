@@ -100,7 +100,7 @@ struct CoinListView: View {
                     }
                 }
             }
-            .navigationBarTitle("Coins", displayMode: .inline)
+            .navigationBarTitle("-", displayMode: .inline)
         }
         .onAppear {
             APIService().fetchCoinList(page: 1) { result in
