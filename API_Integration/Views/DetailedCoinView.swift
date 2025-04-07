@@ -73,13 +73,13 @@ struct DetailedCoinView: View {
                             ScrollView {
                                 CoinInfoCard(title: "Price", value: "$\(detailedCoin.price)")
                                 CoinInfoCard(title: "Market Cap", value: detailedCoin.market_cap)
-                                CoinInfoCard(title: "Volume (last 24 hours)", value: detailedCoin.total_volume_24h)
-                                CoinInfoCard(title: "High (last 24 hours)", value: "$\(detailedCoin.high_24h)")
-                                CoinInfoCard(title: "Low (last 24 hours)", value: "$\(detailedCoin.low_24h)")
-                                CoinInfoCard(title: "Percent Change (last hour)", value: "\(detailedCoin.delta_1h)%")
-                                CoinInfoCard(title: "Percent Change (last day)", value: "\(detailedCoin.delta_24h)%")
-                                CoinInfoCard(title: "Percent Change (last week)", value: "\(detailedCoin.delta_7d)%")
-                                CoinInfoCard(title: "Percent Change (last month)", value: "\(detailedCoin.delta_30d)%")
+                                CoinInfoCard(title: "Volume (24H)", value: detailedCoin.total_volume_24h)
+                                CoinInfoCard(title: "High (24H)", value: "$\(detailedCoin.high_24h)")
+                                CoinInfoCard(title: "Low (24H)", value: "$\(detailedCoin.low_24h)")
+                                CoinInfoCard(title: "Percent Change (1H)", value: "\(detailedCoin.delta_1h)%")
+                                CoinInfoCard(title: "Percent Change (24H)", value: "\(detailedCoin.delta_24h)%")
+                                CoinInfoCard(title: "Percent Change (7D)", value: "\(detailedCoin.delta_7d)%")
+                                CoinInfoCard(title: "Percent Change (30D)", value: "\(detailedCoin.delta_30d)%")
                             }
                             
                         }
