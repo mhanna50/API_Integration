@@ -16,6 +16,10 @@ struct CoinListView: View {
 
                 VStack {
                     // Search Bar
+                    Text("Coins")
+                        .foregroundColor(.white)
+                        .font(.headline)
+                        .padding()
                     SearchBar(text: $searchQuery)
                         .padding(.horizontal)
                         .padding(.top, -35)
@@ -100,7 +104,8 @@ struct CoinListView: View {
                     }
                 }
             }
-            .navigationBarTitle("Coins", displayMode: .inline)
+            navigationBarTitle("Coins", displayMode: .inline)
+                .foregroundColor(.white)
         }
         .onAppear {
             APIService().fetchCoinList(page: 1) { result in
