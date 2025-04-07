@@ -2,6 +2,7 @@
 //  DetailedCoinView.swift
 //  API_Integration
 //
+
 import SwiftUI
 import UIKit
 import Kingfisher
@@ -14,11 +15,13 @@ struct DetailedCoinView: View {
     var body: some View {
         NavigationView {
             ZStack {
+                // Background gradient
                 LinearGradient(colors: [.black, Color.blue.opacity(0.3)], startPoint: .top, endPoint: .bottom)
                     .ignoresSafeArea()
 
                 VStack {
                     if isLoading {
+                        // Show loading spinner
                         ProgressView("Loading...")
                             .progressViewStyle(CircularProgressViewStyle(tint: .blue))
                             .foregroundColor(.white)
@@ -26,16 +29,16 @@ struct DetailedCoinView: View {
                             .padding()
                     } else if let detailedCoin = detailedCoin {
                         VStack(spacing: 20) {
+                            // Coin input field
                             TextField("Enter a coin symbol...", text: $coinSymbol_String)
                                 .multilineTextAlignment(.center)
                                 .padding(6.0)
-                                
                                 .background(
                                     RoundedRectangle(cornerRadius: 4.0, style: .continuous)
                                         .stroke(.white, lineWidth: 1.0)
                                 )
-                            
-                            // Button to fetch new data based on entered coin symbol
+
+                            // Search button
                             Button("Search") {
                                 APIService().fetchCoinDetails(coinSymbol: coinSymbol_String) { result in
                                     switch result {
@@ -50,15 +53,19 @@ struct DetailedCoinView: View {
                                 }
                             }
                             .buttonStyle(.bordered)
-                            
+
+                            // Coin image and name/symbol
                             HStack(spacing: 10) {
                                 KFImage(URL(string: "https://coinlib.io/static/img/coins/small/\((detailedCoin.symbol).lowercased()).png"))
                                     .resizable()
                                     .frame(width: 25, height: 25)
+
                                 Text("\(detailedCoin.name) (\(detailedCoin.symbol))")
                                     .font(.title)
                                     .fontWeight(.heavy)
                                     .foregroundColor(.white)
+
+                                // Arrow indicator for 24h change
                                 if detailedCoin.delta_24h.first == "-" {
                                     Image("Red_Arrow")
                                         .resizable()
@@ -69,7 +76,8 @@ struct DetailedCoinView: View {
                                         .frame(width: 25, height: 25)
                                 }
                             }
-                            
+
+                            // Scrollable coin info cards
                             ScrollView {
                                 CoinInfoCard(title: "Price", value: "$\(detailedCoin.price)")
                                 CoinInfoCard(title: "Market Cap", value: detailedCoin.market_cap)
@@ -81,15 +89,14 @@ struct DetailedCoinView: View {
                                 CoinInfoCard(title: "Percent Change (7D)", value: "\(detailedCoin.delta_7d)%")
                                 CoinInfoCard(title: "Percent Change (30D)", value: "\(detailedCoin.delta_30d)%")
                             }
-                            
                         }
                         .padding()
-                        // Removed transition here
                     }
                 }
                 .padding()
             }
             .onAppear {
+                // Load BTC as default coin on appear
                 APIService().fetchCoinDetails(coinSymbol: "BTC") { result in
                     switch result {
                     case .success(let data):
@@ -103,31 +110,30 @@ struct DetailedCoinView: View {
                 }
             }
         }
-        
     }
 }
+
+// MARK: - Coin Info Card View
 
 struct CoinInfoCard: View {
     let title: String
     let value: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .center, spacing: 8) {
             Text(title.uppercased())
-                .multilineTextAlignment(.center)
                 .font(.caption)
                 .bold()
-                .padding(6)
-                .background(Color.black.opacity(0.6))
                 .foregroundColor(.blue.opacity(0.9))
-                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
 
             Text(value)
+                .font(.headline)
                 .fontWeight(.semibold)
-                .padding(6)
-                .background(Color.black.opacity(0.75))
                 .foregroundColor(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
         }
         .padding()
         .frame(maxWidth: .infinity)
@@ -144,10 +150,11 @@ struct CoinInfoCard: View {
     }
 }
 
+// MARK: - Blur Helper View
 
-// Helper UIViewRepresentable for blur effect
 struct BlurView2: UIViewRepresentable {
     var style: UIBlurEffect.Style
+
     func makeUIView(context: Context) -> UIVisualEffectView {
         return UIVisualEffectView(effect: UIBlurEffect(style: style))
     }
@@ -155,9 +162,12 @@ struct BlurView2: UIViewRepresentable {
     func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
 }
 
+// MARK: - Preview
+
 struct DetailedCoinView_Previews: PreviewProvider {
     static var previews: some View {
         DetailedCoinView()
             .preferredColorScheme(.dark)
     }
 }
+

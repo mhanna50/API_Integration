@@ -8,24 +8,33 @@
 import SwiftUI
 import UIKit
 
+// Main view for displaying global cryptocurrency statistics
 struct GlobalStatsView: View {
-    @State private var stats: CryptoGlobalStats?
-    @State private var isLoading = true
+    // State variables for storing fetched data and loading state
+    @State private var stats: CryptoGlobalStats? // Holds the data once fetched
+    @State private var isLoading = true          // Controls the loading spinner visibility
 
     var body: some View {
         ZStack {
-            LinearGradient(colors: [.black, Color.blue.opacity(0.3)], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
+            // Background gradient from black to transparent blue
+            LinearGradient(colors: [.black, Color.blue.opacity(0.3)],
+                           startPoint: .top,
+                           endPoint: .bottom)
+                .ignoresSafeArea() // Extend background behind safe areas
 
             VStack {
+                // Show loading spinner while fetching data
                 if isLoading {
                     ProgressView("Loading...")
                         .progressViewStyle(CircularProgressViewStyle(tint: .blue))
                         .foregroundColor(.white)
                         .scaleEffect(1.3)
                         .padding()
-                } else if let stats = stats {
+                }
+                // Once data is loaded, display the statistics
+                else if let stats = stats {
                     VStack(spacing: 20) {
+                        // Header with icon and title
                         HStack(spacing: 10) {
                             Image(systemName: "chart.bar.fill")
                                 .font(.title2)
@@ -37,17 +46,18 @@ struct GlobalStatsView: View {
                         }
                         .padding(.bottom, 28)
 
+                        // Individual statistic cards
                         StatsCard(title: "Total Coins", value: "\(stats.coins)")
                         StatsCard(title: "Total Markets", value: "\(stats.markets)")
                         StatsCard(title: "Market Cap", value: stats.total_market_cap)
                         StatsCard(title: "Volume (24h)", value: stats.total_volume_24h)
                     }
                     .padding()
-                    // Removed transition here
                 }
             }
             .padding()
         }
+        // Fetch global market stats when view appears
         .onAppear {
             APIService().fetchGlobalMarketStats { result in
                 switch result {
@@ -64,12 +74,14 @@ struct GlobalStatsView: View {
     }
 }
 
+// View that displays a single statistic in a styled card
 struct StatsCard: View {
-    let title: String
-    let value: String
+    let title: String // Title for the stat (e.g. "Total Coins")
+    let value: String // Corresponding value
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
+            // Title label with background
             Text(title.uppercased())
                 .font(.caption)
                 .bold()
@@ -78,6 +90,7 @@ struct StatsCard: View {
                 .foregroundColor(.blue.opacity(0.9))
                 .clipShape(RoundedRectangle(cornerRadius: 6))
 
+            // Value label with styled background
             Text(value)
                 .font(.title)
                 .fontWeight(.semibold)
@@ -89,6 +102,7 @@ struct StatsCard: View {
         .padding()
         .frame(maxWidth: .infinity)
         .background(
+            // Background blur with a translucent overlay and border
             BlurView(style: .systemUltraThinMaterialDark)
                 .background(Color.white.opacity(0.05))
                 .cornerRadius(16)
@@ -97,24 +111,28 @@ struct StatsCard: View {
                         .stroke(Color.blue.opacity(0.3), lineWidth: 1)
                 )
         )
-        .shadow(color: .blue.opacity(0.25), radius: 10, x: 0, y: 5)
+        .shadow(color: .blue.opacity(0.25), radius: 10, x: 0, y: 5) // Blue glowing shadow
     }
 }
 
-
-// Helper UIViewRepresentable for blur effect
+// UIKit wrapper for blur effect in SwiftUI
 struct BlurView: UIViewRepresentable {
     var style: UIBlurEffect.Style
+
+    // Create the UIView with the desired blur effect
     func makeUIView(context: Context) -> UIVisualEffectView {
         return UIVisualEffectView(effect: UIBlurEffect(style: style))
     }
 
+    // Update view when SwiftUI state changes (unused here)
     func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
 }
 
+// Preview for SwiftUI canvas
 struct GlobalStatsView_Previews: PreviewProvider {
     static var previews: some View {
         GlobalStatsView()
-            .preferredColorScheme(.dark)
+            .preferredColorScheme(.dark) // Dark mode preview
     }
 }
+

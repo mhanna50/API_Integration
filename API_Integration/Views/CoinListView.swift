@@ -1,7 +1,9 @@
 import SwiftUI
 import Kingfisher
 
+// Main View that displays the list of cryptocurrencies
 struct CoinListView: View {
+    // State variables to manage coin data, loading status, search input, and filtered results
     @State private var coins: [Coin] = []
     @State private var isLoading = true
     @State private var searchQuery = ""
@@ -10,33 +12,39 @@ struct CoinListView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // Linear Gradient Background
+                // Gradient background from black to translucent blue
                 LinearGradient(colors: [.black, Color.blue.opacity(0.3)], startPoint: .top, endPoint: .bottom)
                     .ignoresSafeArea()
 
                 VStack {
-                    // Search Bar
-                    Text("Coins")
-                        .foregroundColor(.white)
+                    // Spacer for design balance (can be removed or customized)
+                    Text("")
+                        .foregroundColor(.black)
                         .font(.headline)
                         .padding()
+                    
+                    // Search bar component for filtering coins
                     SearchBar(text: $searchQuery)
                         .padding(.horizontal)
-                        .padding(.top, -35)
+                        .padding(.top, -48)
 
                     if isLoading {
+                        // Show loading indicator while fetching data
                         Spacer()
                         ProgressView("Loading coins...")
                             .padding()
                         Spacer()
                     } else {
+                        // List of filtered coins
                         List(filteredCoins) { coin in
                             VStack(alignment: .leading, spacing: 10) {
                                 HStack {
+                                    // Coin image using Kingfisher
                                     KFImage(URL(string: "https://coinlib.io/static/img/coins/small/\((coin.symbol).lowercased()).png"))
                                         .resizable()
                                         .frame(width: 25, height: 25)
 
+                                    // Coin name with stylized background
                                     Text(coin.name)
                                         .font(.headline)
                                         .padding(6)
@@ -46,6 +54,7 @@ struct CoinListView: View {
 
                                     Spacer()
 
+                                    // Up/down arrow image based on 24h delta
                                     if coin.delta_24h.first == "-" {
                                         Image("Red_Arrow")
                                             .resizable()
@@ -56,11 +65,13 @@ struct CoinListView: View {
                                             .frame(width: 25, height: 25)
                                     }
 
+                                    // Coin symbol
                                     Text(coin.symbol)
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
                                 }
 
+                                // Rank and Price row
                                 HStack {
                                     Text("Rank: \(coin.rank)")
                                     Spacer()
@@ -72,6 +83,7 @@ struct CoinListView: View {
                                 .foregroundColor(.white)
                                 .clipShape(RoundedRectangle(cornerRadius: 6))
 
+                                // Market Cap and Volume row
                                 HStack {
                                     Text("Market Cap: \(coin.market_cap)")
                                     Spacer()
@@ -85,6 +97,7 @@ struct CoinListView: View {
                             }
                             .padding()
                             .background(
+                                // Background blur and styling
                                 BlurView(style: .systemUltraThinMaterialDark)
                                     .background(Color.white.opacity(0.05))
                                     .cornerRadius(16)
@@ -99,15 +112,18 @@ struct CoinListView: View {
                         }
                         .listStyle(PlainListStyle())
                         .onAppear {
+                            // Hide list separators
                             UITableView.appearance().separatorStyle = .none
                         }
                     }
                 }
             }
-            navigationBarTitle("Coins", displayMode: .inline)
-                .foregroundColor(.white)
+            // Remove navigation title text and ensure foreground color is white
+            .navigationBarTitle("", displayMode: .inline)
+            .foregroundColor(.white)
         }
         .onAppear {
+            // Fetch coin data when the view appears
             APIService().fetchCoinList(page: 1) { result in
                 switch result {
                 case .success(let data):
@@ -120,6 +136,7 @@ struct CoinListView: View {
             }
         }
         .onChange(of: searchQuery) {
+            // Filter coins as search query changes
             if searchQuery.isEmpty {
                 filteredCoins = coins
             } else {
@@ -132,8 +149,7 @@ struct CoinListView: View {
     }
 }
 
-// MARK: - Search Bar
-
+// MARK: - Search Bar Component
 struct SearchBar: View {
     @Binding var text: String
 
@@ -166,11 +182,10 @@ struct SearchBar: View {
     }
 }
 
-// MARK: - Blur View Helper (iOS 15+)
-
+// MARK: - Blur View Helper (for compatibility with background visuals)
+// You can define a UIKit BlurView here if needed
 
 // MARK: - Preview
-
 struct CoinListView_Previews: PreviewProvider {
     static var previews: some View {
         CoinListView()
